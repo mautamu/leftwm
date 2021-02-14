@@ -26,6 +26,7 @@ fn main() {
                 .iter()
                 .map(|s| TagModel::new(s))
                 .collect(),
+             autotags: config.autotag.iter().map(|s| (s.program.clone(), s.tag.parse().unwrap_or(0))).collect(),
             ..Default::default()
         };
 

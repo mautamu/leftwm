@@ -11,8 +11,7 @@ pub fn from_event(xw: &XWrap, event: xlib::XPropertyEvent) -> Option<DisplayEven
     }
 
     let event_name = xw.get_xatom_name(event.atom).unwrap();
-    log::trace!("PropertyNotify: {} : {:?}", event_name, &event);
-
+    log::info!("PropertyNotify: {} : {:?}", event_name, &event);
     match event.atom {
         xlib::XA_WM_TRANSIENT_FOR => {
             let handle = WindowHandle::XlibHandle(event.window);
@@ -27,11 +26,14 @@ pub fn from_event(xw: &XWrap, event: xlib::XPropertyEvent) -> Option<DisplayEven
             Some(DisplayEvent::WindowChange(change))
         }
         xlib::XA_WM_NORMAL_HINTS => match build_change_for_size_hints(xw, event.window) {
-            Some(change) => Some(DisplayEvent::WindowChange(change)),
+            Some(change) => {
+               log::info!("leftwm normal hint: {:?}", change);
+               Some(DisplayEvent::WindowChange(change))},
             None => None,
         },
         xlib::XA_WM_HINTS => match xw.get_wmhints(event.window) {
             Some(hints) if hints.flags & xlib::InputHint != 0 => {
+                log::info!("leftwm window hint: {:?}", hints);
                 let handle = WindowHandle::XlibHandle(event.window);
                 let mut change = WindowChange::new(handle);
                 change.never_focus = Some(hints.input == 0);
@@ -75,6 +77,7 @@ fn build_change_for_size_hints(xw: &XWrap, window: xlib::Window) -> Option<Windo
     let handle = WindowHandle::XlibHandle(window);
     let mut change = WindowChange::new(handle);
     let hint = xw.get_hint_sizing_as_xyhw(window)?;
+    log::info!("leftwm logged hints: For window {:?} hint is {:?}", window, hint);
     if hint.x.is_none() && hint.y.is_none() && hint.w.is_none() && hint.h.is_none() {
         //junk hint; change change anything
         return None;

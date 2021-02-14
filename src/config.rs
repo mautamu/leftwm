@@ -1,3 +1,4 @@
+mod autotag;
 mod keybind;
 mod theme_setting;
 mod workspace_config;
@@ -13,6 +14,7 @@ use std::io::prelude::*;
 use std::path::Path;
 use xdg::BaseDirectories;
 
+pub use autotag::Autotag;
 pub use keybind::Keybind;
 pub use theme_setting::ThemeSetting;
 pub use workspace_config::WorkspaceConfig;
@@ -25,6 +27,7 @@ pub struct Config {
     pub tags: Option<Vec<String>>,
     //pub layouts: Option<Vec<String>>,
     pub keybind: Vec<Keybind>,
+    pub autotag: Vec<Autotag>,
 }
 
 pub fn load() -> Config {
@@ -38,12 +41,15 @@ fn load_from_file() -> Result<Config> {
     let config_filename = path.place_config_file("config.toml")?;
     if Path::new(&config_filename).exists() {
         let contents = fs::read_to_string(config_filename)?;
-        Ok(toml::from_str(&contents)?)
+        let tom = toml::from_str(&contents)?;
+        log::info!("leftwm config: {:?}", tom);
+        Ok(tom)
     } else {
         let config = Config::default();
         let toml = toml::to_string(&config).unwrap();
         let mut file = File::create(&config_filename)?;
         file.write_all(&toml.as_bytes())?;
+        log::info!("leftwm config: {:?}", config);
         Ok(config)
     }
 }
@@ -270,6 +276,7 @@ impl Default for Config {
             //layouts: Some(layouts),
             modkey: "Mod4".to_owned(), //win key
             keybind: commands,
+            autotag: Vec::new()
         }
     }
 }

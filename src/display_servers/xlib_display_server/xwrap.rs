@@ -241,6 +241,7 @@ impl XWrap {
         if status == 0 {
             return Err(XlibError::FailedStatus);
         }
+        log::info!("splash attrs: {:?}", attrs);
         Ok(attrs)
     }
 

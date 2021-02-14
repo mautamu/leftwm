@@ -9,7 +9,7 @@ use crate::models::Workspace;
 use crate::state;
 use crate::utils::child_process::Children;
 use serde::{Deserialize, Serialize};
-use std::collections::VecDeque;
+use std::collections::{HashMap,VecDeque};
 use std::sync::{atomic::AtomicBool, Arc};
 
 #[derive(Default, Serialize, Deserialize, Debug)]
@@ -21,11 +21,12 @@ pub struct Manager {
     pub theme_setting: ThemeSetting,
     #[serde(skip)]
     pub tags: Vec<Tag>, //list of all known tags
+    pub autotags: HashMap<String,i32>,
     pub focused_workspace_history: VecDeque<usize>,
     pub focused_window_history: VecDeque<WindowHandle>,
     pub focused_tag_history: VecDeque<String>,
     pub actions: VecDeque<DisplayAction>,
-
+    
     //this is used to limit framerate when resizing/moving windows
     pub frame_rate_limitor: u64,
     #[serde(skip)]
@@ -87,6 +88,22 @@ impl Manager {
         }
         None
     }
+
+    pub fn autotag(&self, name: Option<String>) -> Option<&Workspace> {
+        log::info!("leftwm autotag0.1: {:?} {:?}", name, self.autotags);
+       match self.autotags.get_key_value(self.autotags.keys().find(|&i| i.contains(&name.unwrap_or(String::from("")).to_lowercase()))) {
+         Some(tagid) => { log::info!("Leftwm autotag0: {:?}",tagid);Some(&self.workspaces[*tagid.1 as usize])
+                 }
+         None => {
+         log::info!("Leftwm autotag0: fail");
+       if self.focused_workspace_history.is_empty() {
+            return None;
+        }
+        let index = self.focused_workspace_history[0];
+        Some(&self.workspaces[index])
+         }
+      }
+    } 
 
     pub fn tags_display(&self) -> String {
         let mut active: Vec<String> = vec![];

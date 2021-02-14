@@ -187,6 +187,7 @@ impl<'a> From<XEvent<'a>> for Option<DisplayEvent> {
                         ..Default::default()
                     };
                     change.floating = Some(xyhw);
+                    if window_type == WindowType::Dock { log::info!("Splash: {:?}", event); } 
                     if window_type == WindowType::Dock {
                         if let Some(dock_area) = xw.get_window_strut_array(event.window) {
                             let dems = xw.screens_area_dimensions();
