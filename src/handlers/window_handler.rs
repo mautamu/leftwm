@@ -14,17 +14,22 @@ pub fn created(manager: &mut Manager, mut window: Window) -> bool {
     if let Some(ws) = manager.focused_workspace() {
         window.tags = ws.tags.clone();
         //if dialog, center in workspace
-        if window.type_ == WindowType::Dialog {
+        /*if window.type_ == WindowType::Dialog {
             window.set_floating(true);
-            let new_float_exact = ws.center_halfed();
+            let mut new_float_exact = ws.center_halfed();
             window.normal = ws.xyhw;
+            new_float_exact.center_relative(ws.xyhw, window.border, window.requested);
             window.set_floating_exact(new_float_exact);
-        }
-        if window.type_ == WindowType::Splash {
+        }*/
+        if window.type_ == WindowType::Splash || window.type_ == WindowType::Dialog{
             if let Some(requested) = window.requested {
+                if window.type_ == WindowType::Dialog {
+                  window.set_floating(true);
+                }
                 window.normal = ws.xyhw;
-                requested.update_window_floating(&mut window);
+                requested.update_window_floating(&mut window, true, true);
                 let mut xhyw = window.get_floating_offsets().unwrap_or_default();
+                log::info!("Leftwm requesteD: {:?}", window.requested);
                 xhyw.center_relative(ws.xyhw, window.border, window.requested);
                 window.set_floating_offsets(Some(xhyw));
             } else {

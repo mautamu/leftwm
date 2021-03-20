@@ -34,7 +34,7 @@ impl<'a> From<XEvent<'a>> for Option<DisplayEvent> {
                         let trans = xw.get_transient_for(event.window);
 
                         if let Some(hint) = xw.get_hint_sizing_as_xyhw(event.window) {
-                            hint.update_window_floating(&mut w);
+                            hint.update_window_floating(&mut w, true, true);
                             w.set_requested(hint)
                         }
 
@@ -43,7 +43,7 @@ impl<'a> From<XEvent<'a>> for Option<DisplayEvent> {
                         if w.floating() {
                             if let Ok(geo) = xw.get_window_geometry(event.window) {
                                 log::debug!("geo: {geo:?}", geo = geo);
-                                geo.update_window_floating(&mut w);
+                                geo.update_window_floating(&mut w, true, true);
                             }
                         }
 

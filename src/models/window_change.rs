@@ -60,14 +60,14 @@ impl WindowChange {
             window.never_focus = nf;
         }
         if let Some(floating_change) = self.floating {
-            let changed_floating = floating_change.update_window_floating(window);
+            let changed_floating = floating_change.update_window_floating(window, true, true);
             //if changed_floating {
             //    warn!("CHANGED: floating");
             //}
             changed = changed || changed_floating;
         }
         if let Some(strut) = self.strut {
-            let changed_strut = strut.update_window_strut(window);
+            let changed_strut = strut.update_window_strut(window, true, true);
             //////if changed_strut {
             //////    warn!("CHANGED: strut");
             //////}

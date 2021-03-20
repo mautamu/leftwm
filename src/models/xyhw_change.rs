@@ -45,7 +45,7 @@ impl From<Xyhw> for XyhwChange {
 }
 
 impl XyhwChange {
-    pub fn update(&self, xyhw: &mut Xyhw) -> bool {
+    pub fn update(&self, xyhw: &mut Xyhw, min: bool, max: bool) -> bool {
         let mut changed = false;
         if let Some(x) = self.x {
             if xyhw.x() != x {
@@ -72,25 +72,25 @@ impl XyhwChange {
             }
         }
         if let Some(minw) = self.minw {
-            if xyhw.minw() != minw {
+            if xyhw.minw() != minw && min {
                 xyhw.set_minw(minw);
                 changed = true;
             }
         }
         if let Some(maxw) = self.maxw {
-            if xyhw.maxw() != maxw {
+            if xyhw.maxw() != maxw && max {
                 xyhw.set_maxw(maxw);
                 changed = true;
             }
         }
         if let Some(minh) = self.minh {
-            if xyhw.minh() != minh {
+            if xyhw.minh() != minh && min {
                 xyhw.set_minh(minh);
                 changed = true;
             }
         }
         if let Some(maxh) = self.maxh {
-            if xyhw.maxh() != maxh {
+            if xyhw.maxh() != maxh && max {
                 xyhw.set_maxh(maxh);
                 changed = true;
             }
@@ -98,24 +98,24 @@ impl XyhwChange {
         changed
     }
 
-    pub fn update_window_floating(&self, window: &mut Window) -> bool {
+    pub fn update_window_floating(&self, window: &mut Window, min: bool, max: bool) -> bool {
         let mut changed = false;
         if window.floating() {
             let mut current = window.calculated_xyhw();
-            changed = self.update(&mut current);
+            changed = self.update(&mut current, min, max);
             window.set_floating_exact(current);
         }
         changed
     }
 
-    pub fn update_window_strut(&self, window: &mut Window) -> bool {
+    pub fn update_window_strut(&self, window: &mut Window, min: bool, max: bool) -> bool {
         let mut changed = false;
         if window.strut.is_none() {
             window.strut = Some(Xyhw::default());
             changed = true;
         }
         let mut xyhw = window.strut.unwrap();
-        changed = self.update(&mut xyhw) || changed;
+        changed = self.update(&mut xyhw, min, max) || changed;
         window.strut = Some(xyhw);
         changed
     }
