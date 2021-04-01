@@ -1,4 +1,5 @@
 mod keybind;
+mod tag;
 mod theme_setting;
 mod workspace_config;
 
@@ -17,6 +18,7 @@ use std::path::Path;
 use xdg::BaseDirectories;
 
 pub use keybind::Keybind;
+pub use tag::Tag;
 pub use theme_setting::ThemeSetting;
 pub use workspace_config::WorkspaceConfig;
 
@@ -26,7 +28,8 @@ pub struct Config {
     pub modkey: String,
     pub mousekey: String,
     pub workspaces: Option<Vec<WorkspaceConfig>>,
-    pub tags: Option<Vec<String>>,
+    #[serde(deserialize_with = "string_or_struct")]
+    pub tags: Option<Vec<Tag>>,
     pub layouts: Vec<Layout>,
     //of you are on tag "1" and you goto tag "1" this takes you to the previous tag
     pub disable_current_tag_swap: bool,
@@ -110,9 +113,9 @@ impl Config {
 
     pub fn get_list_of_tags(&self) -> Vec<String> {
         if let Some(tags) = &self.tags {
-            return tags.clone();
+            return tags.iter().map(|tag| tag.name()).collect();
         }
-        Config::default().tags.unwrap()
+        Config::default().tags.unwrap().iter().map(|tag| tag.name()).collect()
     }
 }
 
@@ -255,7 +258,7 @@ impl Default for Config {
 
         let tags = vec!["1", "2", "3", "4", "5", "6", "7", "8", "9"]
             .iter()
-            .map(|s| s.to_string())
+            .map(|s| Tag::new(s.to_string()))
             .collect();
 
         Config {
