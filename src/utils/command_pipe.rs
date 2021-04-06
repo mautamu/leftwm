@@ -221,6 +221,7 @@ mod test {
     use tokio::time;
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore)]
     async fn read_command() {
         let pipe_file = temp_path().await.unwrap();
         let mut command_pipe = CommandPipe::new(pipe_file.clone()).await.unwrap();
@@ -257,6 +258,7 @@ mod test {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore)]
     async fn pipe_cleanup() {
         let pipe_file = temp_path().await.unwrap();
         fs::remove_file(pipe_file.as_path()).await.unwrap();

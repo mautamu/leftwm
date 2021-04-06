@@ -115,6 +115,7 @@ mod test {
     use tokio::io::{AsyncBufReadExt, BufReader};
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore)]
     async fn multiple_peers() {
         let manager = Manager::default();
 
@@ -157,6 +158,7 @@ mod test {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore)]
     async fn get_update() {
         let manager = Manager::default();
 
@@ -185,6 +187,7 @@ mod test {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore)]
     async fn socket_cleanup() {
         let socket_file = temp_path().await.unwrap();
         let mut state_socket = StateSocket::default();
@@ -194,6 +197,7 @@ mod test {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore)]
     async fn socket_already_bound() {
         let socket_file = temp_path().await.unwrap();
         let mut old_socket = StateSocket::default();
