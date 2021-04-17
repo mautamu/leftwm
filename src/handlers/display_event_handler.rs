@@ -40,10 +40,45 @@ impl DisplayEventHandler {
                 //look through the config and build a command if its defined in the config
                 let build = CommandBuilder::new(&self.config);
                 let command = build.xkeyevent(mod_mask, xkeysym);
-                if let Some((cmd, val)) = command {
-                    command_handler::process(manager, &self.config, &cmd, val)
+                if !manager.send_keys_chk() {
+                    if let Some((cmd, val)) = command {
+                        command_handler::process(manager, &self.config, &cmd, val)
+                    } else {
+                        false
+                    }
                 } else {
-                    false
+                    // We need to send it to leftwm-check for processing and ignore it on our end
+                    match xdg::BaseDirectories::with_prefix("leftwm") {
+                        Ok(xdg_loc) => {
+                            match xdg_loc.find_runtime_file("keys.pipe") {
+                                // If it doesn't exist, inform the Manager:
+                                None => return manager.stop_send_keys(),
+                                Some(file) => {
+                                    // write the key combo to the file
+                                    use std::fs::OpenOptions;
+                                    use std::io::Write;
+                                    match OpenOptions::new().append(true).open(file) {
+                                        Err(_) => return false,
+                                        Ok(mut fst) => {
+                                            match fst.write_all(
+                                                format!(
+                                                    ">{}||{}-\n",
+                                                    mod_mask,
+                                                    crate::utils::xkeysym_lookup::from_keysym(xkeysym)
+                                                        .unwrap_or("NONE")
+                                                )
+                                                .as_bytes(),
+                                            ) {
+                                                Err(_) => return false,
+                                                Ok(_) => return true,
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Err(_) => return manager.stop_send_keys(),
+                    }
                 }
             }
 

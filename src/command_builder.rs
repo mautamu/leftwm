@@ -44,8 +44,7 @@ impl CommandBuilder {
         key: XKeysym,
         //event: XKeyEvent,
     ) -> Option<(Command, Option<String>)> {
-        let keybind = self.find_keybind_for(mask, key);
-        match keybind {
+        match self.find_keybind_for(mask, key) {
             Some(bind) => {
                 let cmd = bind.command.clone();
                 let val = bind.value.clone();

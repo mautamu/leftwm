@@ -12,6 +12,7 @@ use crate::{config::ThemeSetting, layouts::Layout};
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::sync::{atomic::AtomicBool, Arc};
+use std::time::SystemTime;
 
 /// Maintains current program state.
 #[derive(Default, Serialize, Deserialize, Debug)]
@@ -37,6 +38,8 @@ pub struct Manager {
     pub reap_requested: Arc<AtomicBool>,
     #[serde(skip)]
     pub reload_requested: bool,
+    #[serde(skip)]
+    pub send_keys: Option<SystemTime>,
 }
 
 impl Manager {
@@ -71,6 +74,40 @@ impl Manager {
     #[must_use]
     pub fn tag_index(&self, tag: &str) -> Option<usize> {
         Some(self.tags.iter().position(|t| t.id == tag)).unwrap_or(None)
+    }
+
+    #[must_use]
+    pub fn send_keys(&mut self) -> bool {
+        self.send_keys = Some(SystemTime::now());
+        true
+    }
+
+    #[must_use]
+    pub fn stop_send_keys(&mut self) -> bool {
+        self.send_keys = None;
+        true
+    }
+
+    /// Informs display event handler if key presses should be sent to leftwm-check or not
+    #[must_use]
+    pub fn send_keys_chk(&mut self) -> bool {
+        match self.send_keys {
+            None => false,
+            Some(time) => {
+                match time.elapsed() {
+                    Ok(elapsed) => {
+                        if elapsed.as_secs() > 30 {
+                            // If user has been listened to for 30 seconds, the process probably
+                            // has frozen and needs to exit
+                            self.stop_send_keys()
+                        } else {
+                            true
+                        }
+                    }
+                    Err(_) => self.stop_send_keys(),
+                }
+            }
+        }
     }
 
     /// Return the currently focused window.

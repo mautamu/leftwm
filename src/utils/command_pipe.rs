@@ -115,6 +115,10 @@ fn parse_command(s: String) -> std::result::Result<ExternalCommand, ()> {
         return Ok(ExternalCommand::PreviousLayout);
     } else if s.starts_with("CloseWindow") {
         return Ok(ExternalCommand::CloseWindow);
+    } else if s.starts_with("StartSendKeys") {
+        return Ok(ExternalCommand::StartSendKeys);
+    } else if s.starts_with("StopSendKeys") {
+        return Ok(ExternalCommand::StopSendKeys);
     }
 
     Err(())
@@ -211,6 +215,8 @@ pub enum ExternalCommand {
     NextLayout,
     PreviousLayout,
     SetLayout(String),
+    StartSendKeys,
+    StopSendKeys,
 }
 
 #[cfg(test)]
