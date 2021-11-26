@@ -11,6 +11,7 @@ repository = "https://github.com/leftwm/leftwm"
 readme = "README.md"
 
 [dependencies]
+notify-rust = "4.5.5"
 signal-hook = "0.3.4"
 mio = "0.7.7"
 nix = "0.20.0"

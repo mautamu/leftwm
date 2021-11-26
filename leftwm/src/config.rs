@@ -432,7 +432,12 @@ impl leftwm_core::Config for Config {
         let state_file = match File::create(&path) {
             Ok(file) => file,
             Err(err) => {
-                log::error!("Cannot create file at path {}: {}", path.display(), err);
+                leftwm_core::log!(
+                    "error",
+                    "Cannot create file at path {}: {}",
+                    path.display(),
+                    err
+                );
                 return;
             }
         };

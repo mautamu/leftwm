@@ -12,6 +12,11 @@ use xdg::BaseDirectories;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    leftwm_core::Notification::new()
+            .summary("Firefox News")
+                .body("This will almost look like a real firefox notification.")
+                    .icon("firefox");
+        //                .show()?;
     let matches = App::new("LeftWM Check")
         .author("Lex Childs <lex.childs@gmail.com>")
         .version(env!("CARGO_PKG_VERSION"))

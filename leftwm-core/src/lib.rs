@@ -47,3 +47,7 @@ pub use state::State;
 pub use utils::child_process;
 pub use utils::command_pipe::CommandPipe;
 pub use utils::state_socket::StateSocket;
+
+pub use log::log as log_log;
+pub use log::Level as Level;
+pub use notify_rust::Notification;
