@@ -60,7 +60,6 @@ jobs:
           command: check
 
     - name: Display MSRV
-      uses: actions-rs/cargo@v1
       run: cargo -V
 
   nix-flake:
