@@ -66,8 +66,11 @@ pub trait Config {
 
 #[cfg(test)]
 #[allow(clippy::module_name_repetitions)]
+#[derive(Default)]
 pub struct TestConfig {
     pub tags: Vec<String>,
+    pub layouts: Vec<Layout>,
+    pub workspaces: Option<Vec<Workspace>>,
 }
 
 #[cfg(test)]
@@ -79,7 +82,7 @@ impl Config for TestConfig {
         self.tags.clone()
     }
     fn workspaces(&self) -> Option<Vec<Workspace>> {
-        unimplemented!()
+        self.workspaces.clone()
     }
     fn focus_behaviour(&self) -> FocusBehaviour {
         FocusBehaviour::ClickTo
@@ -94,7 +97,7 @@ impl Config for TestConfig {
         vec![]
     }
     fn layouts(&self) -> Vec<Layout> {
-        vec![]
+        self.layouts.clone()
     }
     fn layout_mode(&self) -> LayoutMode {
         LayoutMode::Workspace
